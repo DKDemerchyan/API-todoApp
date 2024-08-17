@@ -25,7 +25,7 @@ func getAllTasks(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(response)
+	_, _ = w.Write(response)
 }
 
 func getTask(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +45,7 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(response)
+	_, _ = w.Write(response)
 }
 
 func createTask(w http.ResponseWriter, r *http.Request) {
@@ -65,7 +65,7 @@ func createTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, ok := tasks[task.ID]; ok {
-		http.Error(w, fmt.Sprintf("Task with id %s already exists", task.ID), http.StatusConflict)
+		http.Error(w, fmt.Sprintf("Task with id %s already exists", task.ID), http.StatusBadRequest)
 		return
 	}
 	tasks[task.ID] = task
@@ -74,13 +74,13 @@ func createTask(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func editTask(w http.ResponseWriter, r *http.Request) {
+func updateTask(w http.ResponseWriter, r *http.Request) {
 	var task Task
 	var buf bytes.Buffer
 
 	id := chi.URLParam(r, "id")
 	if _, ok := tasks[id]; !ok {
-		http.Error(w, fmt.Sprintf("Task with id %s not fount", id), http.StatusNotFound)
+		http.Error(w, fmt.Sprintf("Task with id %s not fount", id), http.StatusBadRequest)
 		return
 	}
 
@@ -124,7 +124,7 @@ func main() {
 
 	r.Post("/tasks", createTask)
 
-	r.Put("/tasks/{id}", editTask)
+	r.Put("/tasks/{id}", updateTask)
 
 	r.Delete("/tasks/{id}", deleteTask)
 
